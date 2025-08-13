@@ -7,38 +7,39 @@ from plotly.subplots import make_subplots
 # --- Page Setup ---
 st.set_page_config(page_title="Prepay Power: District Heating Forecast", layout="wide")
 
-# --- Clean Modern Styling ---
+# --- Prepay Power Website Styling ---
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     
     /* Global Styles */
     .main {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         font-size: 11px;
-        background: #fafafa;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     }
     
     /* Header Styling */
     .header-container {
-        background: #e6007e;
-        padding: 1.5rem 0;
-        margin: -1rem -1rem 2rem -1rem;
-        border-radius: 0 0 12px 12px;
-        box-shadow: 0 2px 8px rgba(230, 0, 126, 0.15);
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        padding: 2rem 0;
+        margin: -2rem -2rem 2rem -2rem;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 20px rgba(40, 167, 69, 0.2);
     }
     
     .header-title {
         color: white !important;
-        font-size: 2rem !important;
-        font-weight: 600 !important;
+        font-size: 2.5rem !important;
+        font-weight: 800 !important;
         text-align: center;
         margin: 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     .header-subtitle {
         color: rgba(255,255,255,0.9) !important;
-        font-size: 1rem !important;
+        font-size: 1.1rem !important;
         text-align: center;
         margin-top: 0.5rem;
         font-weight: 400;
@@ -46,41 +47,58 @@ st.markdown("""
     
     /* Sidebar Styling */
     .css-1d391kg {
-        background: #ffffff;
-        border-right: 1px solid #e5e7eb;
+        background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+        border-right: 1px solid #e9ecef;
     }
     
     .sidebar .sidebar-content {
-        background: #ffffff;
+        background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+    }
+    
+    /* Card Styling */
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 0.5rem 0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
     }
     
     /* Frame Styling */
     .frame-container {
         background: white;
-        border-radius: 8px;
-        padding: 1.25rem;
+        border-radius: 16px;
+        padding: 1.5rem;
         margin: 0.5rem 0;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        border: 1px solid #e5e7eb;
-        min-height: 350px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border: 1px solid #e9ecef;
+        min-height: 400px;
     }
     
     .frame-title {
-        color: #374151 !important;
-        font-size: 1.1rem !important;
-        font-weight: 600 !important;
+        color: #28a745 !important;
+        font-size: 1.2rem !important;
+        font-weight: 700 !important;
         margin-bottom: 1rem;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 2px solid #e9ecef;
         padding-bottom: 0.5rem;
     }
     
     /* Metric Styling */
     .stMetric {
-        background: #f9fafb;
-        border-radius: 6px;
-        padding: 0.75rem;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border-radius: 8px;
+        padding: 1rem;
         margin: 0.5rem 0;
-        border: 1px solid #e5e7eb;
+        color: white;
+        font-weight: 600;
     }
     
     .stMetric > div {
@@ -88,8 +106,8 @@ st.markdown("""
     }
     
     .stMetric label {
-        color: #6b7280 !important;
-        font-size: 0.875rem !important;
+        color: rgba(255,255,255,0.9) !important;
+        font-size: 0.9rem !important;
         font-weight: 500 !important;
     }
     
@@ -100,61 +118,62 @@ st.markdown("""
     /* Chart Styling */
     .stPlotlyChart {
         background: white;
-        border-radius: 8px;
-        padding: 0.75rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
     
     /* Form Controls */
     .stSelectbox, .stNumberInput, .stSlider, .stRadio {
         background: white;
-        border-radius: 6px;
-        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
     }
     
     .stSelectbox > div, .stNumberInput > div {
         background: white;
-        border-radius: 6px;
-        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
     }
     
     /* Section Headers */
     .section-header {
-        background: #e6007e;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
         color: white;
-        padding: 0.75rem 1rem;
-        border-radius: 6px;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
         margin: 1rem 0;
         font-weight: 600;
-        font-size: 0.875rem;
+        font-size: 1rem;
     }
     
     /* Data Table Styling */
     .stDataFrame {
         background: white;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
     
     /* Custom Button Styling */
     .stButton > button {
-        background: #e6007e;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
         color: white;
         border: none;
-        border-radius: 6px;
+        border-radius: 8px;
         padding: 0.5rem 1rem;
-        font-weight: 500;
-        transition: all 0.2s ease;
+        font-weight: 600;
+        transition: all 0.3s ease;
     }
     
     .stButton > button:hover {
-        background: #be185d;
+        background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+        transform: translateY(-1px);
     }
     
     /* Responsive Design */
     @media (max-width: 768px) {
         .header-title {
-            font-size: 1.5rem !important;
+            font-size: 2rem !important;
         }
         .frame-container {
             margin: 0.25rem 0;
@@ -169,21 +188,21 @@ st.markdown("""
     
     /* Custom Scrollbar */
     ::-webkit-scrollbar {
-        width: 6px;
+        width: 8px;
     }
     
     ::-webkit-scrollbar-track {
-        background: #f3f4f6;
-        border-radius: 3px;
+        background: #f1f1f1;
+        border-radius: 4px;
     }
     
     ::-webkit-scrollbar-thumb {
-        background: #d1d5db;
-        border-radius: 3px;
+        background: #28a745;
+        border-radius: 4px;
     }
     
     ::-webkit-scrollbar-thumb:hover {
-        background: #9ca3af;
+        background: #218838;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -221,222 +240,48 @@ sites = {
     "Custom": {}
 }
 
-# --- Dramatic Configuration Panel ---
-st.markdown("""
-<style>
-    .config-panel {
-        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-        border-radius: 16px;
-        padding: 2rem;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        border: 1px solid #475569;
-        margin: 1rem 0;
-    }
-    
-    .config-header {
-        background: linear-gradient(135deg, #e6007e 0%, #be185d 100%);
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-        text-align: center;
-        box-shadow: 0 4px 15px rgba(230, 0, 126, 0.3);
-    }
-    
-    .dial-container {
-        background: linear-gradient(145deg, #2d3748, #1a202c);
-        border-radius: 12px;
-        padding: 1rem;
-        margin: 0.5rem 0;
-        border: 1px solid #4a5568;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-    }
-    
-    .dial-label {
-        color: #e2e8f0;
-        font-size: 0.8rem;
-        font-weight: 600;
-        text-align: center;
-        margin-bottom: 0.5rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .dial-value {
-        color: #e6007e;
-        font-size: 1.2rem;
-        font-weight: 700;
-        text-align: center;
-        margin-top: 0.5rem;
-        text-shadow: 0 0 10px rgba(230, 0, 126, 0.5);
-    }
-    
-    .toggle-switch {
-        background: linear-gradient(145deg, #374151, #1f2937);
-        border-radius: 8px;
-        padding: 0.75rem;
-        margin: 0.5rem 0;
-        border: 1px solid #4b5563;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-    }
-    
-    .site-info {
-        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-        color: white;
-        padding: 1rem;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-        box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
-    }
-</style>
-""", unsafe_allow_html=True)
-
-# Site Selection Toggle
-col1, col2 = st.columns([1, 3])
-with col1:
-    site_toggle = st.toggle("🏢 Barnwell Site", value=True, help="Toggle between Barnwell (pre-configured) and Custom site")
-    
-# Set site based on toggle
-site = "Barnwell" if site_toggle else "Custom"
-defaults = sites.get(site, {})
-
-# Main Configuration Panel
-st.markdown("""
-<div class="config-panel">
-    <div class="config-header">
-        <h3 style="margin: 0; font-weight: 700; font-size: 1.3rem;">⚙️ MASTER CONTROL PANEL</h3>
-        <p style="margin: 0.5rem 0 0 0; opacity: 0.9; font-size: 0.9rem;">{'Barnwell Site - Pre-configured' if site_toggle else 'Custom Site - Full Control'}</p>
-    </div>
+# --- Sidebar Styling ---
+st.sidebar.markdown("""
+<div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+    <h3 style="color: white; margin: 0; font-weight: 600;">⚙️ Configuration Panel</h3>
 </div>
 """, unsafe_allow_html=True)
 
-# Show site info if Barnwell is selected
-if site_toggle:
-    st.markdown("""
-    <div class="site-info">
-        <h4 style="margin: 0 0 0.5rem 0; font-weight: 600;">🏢 Barnwell Site - Pre-configured Parameters</h4>
-        <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">
-            Area: 22,102 m² | CHP: 44.7 kW Thermal, 19.97 kW Electric | Heat Pump: 60 kW, COP 4.0 | 
-            Boiler Efficiency: 85% | System Loss: 50%
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+# --- Select Site ---
+site = st.sidebar.selectbox("📍 Select Site", list(sites.keys()))
+defaults = sites.get(site, {})
 
-# Configuration Controls in Single Frame
-with st.container():
-    st.markdown('<div class="config-panel">', unsafe_allow_html=True)
-    
-    # Top Row - Building & System Parameters
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        st.markdown('<div class="dial-container">', unsafe_allow_html=True)
-        st.markdown('<div class="dial-label">🏠 Building Area</div>', unsafe_allow_html=True)
-        area = st.slider("", 0, 50000, defaults.get("area", 0), 100, disabled=site_toggle, key="area_dial")
-        st.markdown(f'<div class="dial-value">{area:,.0f} m²</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        st.markdown('<div class="dial-container">', unsafe_allow_html=True)
-        st.markdown('<div class="dial-label">🌡️ Indoor Temp</div>', unsafe_allow_html=True)
-        indoor_temp = st.slider("", 15, 25, defaults.get("indoor_temp", 20), 1, disabled=site_toggle, key="indoor_dial")
-        st.markdown(f'<div class="dial-value">{indoor_temp}°C</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown('<div class="dial-container">', unsafe_allow_html=True)
-        st.markdown('<div class="dial-label">⚡ U-Value</div>', unsafe_allow_html=True)
-        u_value = st.slider("", 0.05, 0.5, float(defaults.get("u_value", 0.15)), 0.01, disabled=site_toggle, key="uvalue_dial")
-        st.markdown(f'<div class="dial-value">{u_value:.2f} W/m²K</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        st.markdown('<div class="dial-container">', unsafe_allow_html=True)
-        st.markdown('<div class="dial-label">🔥 Boiler Efficiency</div>', unsafe_allow_html=True)
-        boiler_eff = st.slider("", 1, 100, int(defaults.get("boiler_eff", 85)), 5, disabled=site_toggle, key="boiler_dial")
-        st.markdown(f'<div class="dial-value">{boiler_eff}%</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    with col3:
-        st.markdown('<div class="dial-container">', unsafe_allow_html=True)
-        st.markdown('<div class="dial-label">💰 Electricity Price</div>', unsafe_allow_html=True)
-        elec_price = st.slider("", 0.1, 0.5, float(defaults.get("elec_price", 0.25)), 0.01, disabled=site_toggle, key="elec_dial")
-        st.markdown(f'<div class="dial-value">€{elec_price:.2f}/kWh</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        st.markdown('<div class="dial-container">', unsafe_allow_html=True)
-        st.markdown('<div class="dial-label">🌍 CO₂ Factor</div>', unsafe_allow_html=True)
-        co2_factor = st.slider("", 0.1, 0.5, float(defaults.get("co2_factor", 0.23)), 0.01, disabled=site_toggle, key="co2_dial")
-        st.markdown(f'<div class="dial-value">{co2_factor:.2f} kg/kWh</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    with col4:
-        st.markdown('<div class="dial-container">', unsafe_allow_html=True)
-        st.markdown('<div class="dial-label">📊 Chart Type</div>', unsafe_allow_html=True)
-        chart_type = st.selectbox("", ["Line Chart", "Bar Chart", "Area Chart", "Scatter Plot"], key="chart_dial")
-        st.markdown(f'<div class="dial-value">{chart_type}</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        st.markdown('<div class="toggle-switch">', unsafe_allow_html=True)
-        st.markdown('<div class="dial-label">📈 Show Forecast</div>', unsafe_allow_html=True)
-        show_forecast = st.checkbox("", value=True, key="forecast_toggle")
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    # System Configuration Row
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown('<div class="toggle-switch">', unsafe_allow_html=True)
-        st.markdown('<div class="dial-label">🔥 CHP System</div>', unsafe_allow_html=True)
-        chp_on = st.toggle("Installed", value=defaults.get("chp_installed") == "Yes", disabled=site_toggle, key="chp_toggle")
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        if chp_on:
-            st.markdown('<div class="dial-container">', unsafe_allow_html=True)
-            st.markdown('<div class="dial-label">CHP Thermal Output</div>', unsafe_allow_html=True)
-            chp_th = st.slider("", 0, 100, int(defaults.get("chp_th", 0)), 1, disabled=site_toggle, key="chp_th_dial")
-            st.markdown(f'<div class="dial-value">{chp_th} kW</div>', unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-            
-            st.markdown('<div class="dial-container">', unsafe_allow_html=True)
-            st.markdown('<div class="dial-label">CHP Hours/Day</div>', unsafe_allow_html=True)
-            chp_hours = st.slider("", 0, 24, defaults.get("chp_hours", 0), 1, disabled=site_toggle, key="chp_hours_dial")
-            st.markdown(f'<div class="dial-value">{chp_hours} hrs</div>', unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-        else:
-            chp_th = chp_hours = 0
-    
-    with col2:
-        st.markdown('<div class="toggle-switch">', unsafe_allow_html=True)
-        st.markdown('<div class="dial-label">❄️ Heat Pump System</div>', unsafe_allow_html=True)
-        hp_on = st.toggle("Installed", value=defaults.get("hp_installed") == "Yes", disabled=site_toggle, key="hp_toggle")
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        if hp_on:
-            st.markdown('<div class="dial-container">', unsafe_allow_html=True)
-            st.markdown('<div class="dial-label">HP Thermal Output</div>', unsafe_allow_html=True)
-            hp_th = st.slider("", 0, 100, int(defaults.get("hp_th", 0)), 1, disabled=site_toggle, key="hp_th_dial")
-            st.markdown(f'<div class="dial-value">{hp_th} kW</div>', unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-            
-            st.markdown('<div class="dial-container">', unsafe_allow_html=True)
-            st.markdown('<div class="dial-label">HP COP</div>', unsafe_allow_html=True)
-            hp_cop = st.slider("", 1, 6, float(defaults.get("hp_cop", 1)), 0.1, disabled=site_toggle, key="hp_cop_dial")
-            st.markdown(f'<div class="dial-value">{hp_cop:.1f}</div>', unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-        else:
-            hp_th = hp_cop = 0
-    
-    # Additional parameters
-    outdoor_temp = defaults.get("outdoor_temp", 5)
-    system_loss = defaults.get("system_loss", 0.5)
-    chp_el = defaults.get("chp_el", 0) if chp_on else 0
-    chp_gas = defaults.get("chp_gas", 0) if chp_on else 0
-    chp_adj = defaults.get("chp_adj", 0.95) if chp_on else 0
-    hp_hours = defaults.get("hp_hours", 0) if hp_on else 0
-    show_metrics = True
-    show_breakdown = True
-    show_efficiency = True
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+# --- Input Panel ---
+st.sidebar.markdown('<div class="section-header">🔧 Input Parameters</div>', unsafe_allow_html=True)
+area = st.sidebar.number_input("Area (m²)", value=defaults.get("area", 0))
+indoor_temp = st.sidebar.number_input("Indoor Temp (°C)", value=defaults.get("indoor_temp", 20))
+outdoor_temp = st.sidebar.number_input("Outdoor Temp (°C)", value=defaults.get("outdoor_temp", 5))
+u_value = st.sidebar.number_input("U-Value (W/m²K)", value=defaults.get("u_value", 0.15))
+system_loss = st.sidebar.slider("System Loss (%)", 0, 100, int(defaults.get("system_loss", 0.5) * 100)) / 100
+boiler_eff = st.sidebar.slider("Boiler Efficiency (%)", 1, 100, int(defaults.get("boiler_eff", 85))) / 100
+co2_factor = st.sidebar.number_input("CO₂ Emission Factor (kg/kWh)", value=defaults.get("co2_factor", 0.23))
+elec_price = st.sidebar.number_input("Electricity Price (€/kWh)", value=defaults.get("elec_price", 0.25))
+
+st.sidebar.markdown('<div class="section-header">⚙️ System Configuration</div>', unsafe_allow_html=True)
+chp_on = st.sidebar.radio("CHP Installed?", ["Yes", "No"], index=0 if defaults.get("chp_installed") == "Yes" else 1)
+chp_th = st.sidebar.number_input("CHP Thermal Output (kW)", value=defaults.get("chp_th", 0), disabled=chp_on == "No")
+chp_el = st.sidebar.number_input("CHP Elec Output (kW)", value=defaults.get("chp_el", 0), disabled=chp_on == "No")
+chp_gas = st.sidebar.number_input("CHP Gas Input (kW)", value=defaults.get("chp_gas", 0), disabled=chp_on == "No")
+chp_hours = st.sidebar.slider("CHP Hours/Day", 0, 24, value=defaults.get("chp_hours", 0), disabled=chp_on == "No")
+chp_adj = st.sidebar.slider("CHP Adjustment (%)", 0, 100, int(defaults.get("chp_adj", 0.95) * 100), disabled=chp_on == "No") / 100
+
+hp_on = st.sidebar.radio("Heat Pump Installed?", ["Yes", "No"], index=0 if defaults.get("hp_installed") == "Yes" else 1)
+hp_th = st.sidebar.number_input("HP Thermal Output (kW)", value=defaults.get("hp_th", 0), disabled=hp_on == "No")
+hp_hours = st.sidebar.slider("HP Hours/Day", 0, 24, value=defaults.get("hp_hours", 0), disabled=hp_on == "No")
+hp_cop = st.sidebar.number_input("HP COP", value=defaults.get("hp_cop", 1), disabled=hp_on == "No")
+
+# --- Dynamic Visualization Controls ---
+st.sidebar.markdown('<div class="section-header">📊 Visualization Settings</div>', unsafe_allow_html=True)
+chart_type = st.sidebar.selectbox("Chart Type", ["Line Chart", "Bar Chart", "Area Chart", "Scatter Plot"])
+show_metrics = st.sidebar.checkbox("Show Metrics", value=True)
+show_forecast = st.sidebar.checkbox("Show Monthly Forecast", value=True)
+show_breakdown = st.sidebar.checkbox("Show Energy Breakdown", value=True)
+show_efficiency = st.sidebar.checkbox("Show Efficiency Analysis", value=True)
 
 # --- Calculations ---
 heat_demand = (u_value * area * (indoor_temp - outdoor_temp) * 24 / 1000) * (1 + system_loss)
@@ -478,15 +323,15 @@ with frame2:
         if chart_type == "Bar Chart":
             fig = px.bar(energy_df, x="Source", y="Energy (kWh)", 
                         title="Daily Energy Breakdown", color="Source",
-                        color_discrete_sequence=['#e6007e', '#8b5cf6', '#06b6d4'])
+                        color_discrete_sequence=['#28a745', '#20c997', '#17a2b8'])
         elif chart_type == "Pie Chart":
             fig = px.pie(energy_df, values="Energy (kWh)", names="Source", 
                         title="Energy Source Distribution",
-                        color_discrete_sequence=['#e6007e', '#8b5cf6', '#06b6d4'])
+                        color_discrete_sequence=['#28a745', '#20c997', '#17a2b8'])
         else:
             fig = px.bar(energy_df, x="Source", y="Energy (kWh)", 
                         title="Daily Energy Breakdown", color="Source",
-                        color_discrete_sequence=['#e6007e', '#8b5cf6', '#06b6d4'])
+                        color_discrete_sequence=['#28a745', '#20c997', '#17a2b8'])
         
         fig.update_layout(
             font=dict(size=11, family="Inter"),
@@ -494,7 +339,7 @@ with frame2:
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
             title_font_size=14,
-            title_font_color='#374151'
+            title_font_color='#28a745'
         )
         st.plotly_chart(fig, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -517,7 +362,7 @@ with frame3:
         
         fig = px.bar(eff_df, x="Metric", y="Value (%)", 
                     title="System Efficiency Metrics", color="Metric",
-                    color_discrete_sequence=['#e6007e', '#8b5cf6', '#06b6d4', '#10b981'])
+                    color_discrete_sequence=['#28a745', '#20c997', '#17a2b8', '#6f42c1'])
         fig.update_layout(
             font=dict(size=11, family="Inter"),
             height=300,
@@ -525,7 +370,7 @@ with frame3:
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
             title_font_size=14,
-            title_font_color='#374151'
+            title_font_color='#28a745'
         )
         st.plotly_chart(fig, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -548,14 +393,14 @@ with frame4:
     
     fig = px.bar(cost_df, x="Component", y="Cost (€/day)", 
                 title="Daily Cost Breakdown", color="Cost (€/day)",
-                color_continuous_scale=['#ef4444', '#f59e0b', '#10b981'])
+                color_continuous_scale=['#dc3545', '#ffc107', '#28a745'])
     fig.update_layout(
         font=dict(size=11, family="Inter"),
         height=300,
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         title_font_size=14,
-        title_font_color='#374151'
+        title_font_color='#28a745'
     )
     st.plotly_chart(fig, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -563,8 +408,8 @@ with frame4:
 # --- Monthly Forecast (Full Width) ---
 if show_forecast:
     st.markdown("""
-    <div style="background: #e6007e; padding: 1.25rem; border-radius: 8px; margin: 2rem 0;">
-        <h2 style="color: white; margin: 0; font-weight: 600;">📈 Monthly Forecast</h2>
+    <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 1.5rem; border-radius: 16px; margin: 2rem 0;">
+        <h2 style="color: white; margin: 0; font-weight: 700;">📈 Monthly Forecast</h2>
     </div>
     """, unsafe_allow_html=True)
     
@@ -593,19 +438,19 @@ if show_forecast:
     if chart_type == "Line Chart":
         fig = px.line(df, x="Month", y=["Heating", "CHP", "HP", "Boiler"],
                       title="Monthly Heating Forecast (kWh)", markers=True,
-                      color_discrete_sequence=['#e6007e', '#8b5cf6', '#06b6d4', '#10b981'])
+                      color_discrete_sequence=['#28a745', '#20c997', '#17a2b8', '#6f42c1'])
     elif chart_type == "Bar Chart":
         fig = px.bar(df, x="Month", y=["Heating", "CHP", "HP", "Boiler"],
                      title="Monthly Heating Forecast (kWh)", barmode='stack',
-                     color_discrete_sequence=['#e6007e', '#8b5cf6', '#06b6d4', '#10b981'])
+                     color_discrete_sequence=['#28a745', '#20c997', '#17a2b8', '#6f42c1'])
     elif chart_type == "Area Chart":
         fig = px.area(df, x="Month", y=["Heating", "CHP", "HP", "Boiler"],
                       title="Monthly Heating Forecast (kWh)",
-                      color_discrete_sequence=['#e6007e', '#8b5cf6', '#06b6d4', '#10b981'])
+                      color_discrete_sequence=['#28a745', '#20c997', '#17a2b8', '#6f42c1'])
     elif chart_type == "Scatter Plot":
         fig = px.scatter(df, x="Month", y=["Heating", "CHP", "HP", "Boiler"],
                          title="Monthly Heating Forecast (kWh)",
-                         color_discrete_sequence=['#e6007e', '#8b5cf6', '#06b6d4', '#10b981'])
+                         color_discrete_sequence=['#28a745', '#20c997', '#17a2b8', '#6f42c1'])
     
     fig.update_layout(
         yaxis_title="Energy (kWh)", 
@@ -616,18 +461,18 @@ if show_forecast:
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         title_font_size=16,
-        title_font_color='#374151'
+        title_font_color='#28a745'
     )
     
     # Add container styling for the chart
-    st.markdown('<div style="background: white; border-radius: 8px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">', unsafe_allow_html=True)
+    st.markdown('<div style="background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">', unsafe_allow_html=True)
     st.plotly_chart(fig, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Interactive data table
     st.markdown("""
-    <div style="background: white; border-radius: 8px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-top: 1rem;">
-        <h3 style="color: #374151; font-weight: 600; margin-bottom: 1rem;">📋 Forecast Data</h3>
+    <div style="background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-top: 1rem;">
+        <h3 style="color: #28a745; font-weight: 700; margin-bottom: 1rem;">📋 Forecast Data</h3>
     </div>
     """, unsafe_allow_html=True)
     st.dataframe(df, use_container_width=True)
