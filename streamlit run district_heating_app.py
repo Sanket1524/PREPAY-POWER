@@ -221,7 +221,77 @@ sites = {
     "Custom": {}
 }
 
-# --- Site Selection Toggle ---
+# --- Dramatic Configuration Panel ---
+st.markdown("""
+<style>
+    .config-panel {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        border: 1px solid #475569;
+        margin: 1rem 0;
+    }
+    
+    .config-header {
+        background: linear-gradient(135deg, #e6007e 0%, #be185d 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(230, 0, 126, 0.3);
+    }
+    
+    .dial-container {
+        background: linear-gradient(145deg, #2d3748, #1a202c);
+        border-radius: 12px;
+        padding: 1rem;
+        margin: 0.5rem 0;
+        border: 1px solid #4a5568;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .dial-label {
+        color: #e2e8f0;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .dial-value {
+        color: #e6007e;
+        font-size: 1.2rem;
+        font-weight: 700;
+        text-align: center;
+        margin-top: 0.5rem;
+        text-shadow: 0 0 10px rgba(230, 0, 126, 0.5);
+    }
+    
+    .toggle-switch {
+        background: linear-gradient(145deg, #374151, #1f2937);
+        border-radius: 8px;
+        padding: 0.75rem;
+        margin: 0.5rem 0;
+        border: 1px solid #4b5563;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .site-info {
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Site Selection Toggle
 col1, col2 = st.columns([1, 3])
 with col1:
     site_toggle = st.toggle("🏢 Barnwell Site", value=True, help="Toggle between Barnwell (pre-configured) and Custom site")
@@ -230,94 +300,143 @@ with col1:
 site = "Barnwell" if site_toggle else "Custom"
 defaults = sites.get(site, {})
 
-# --- Configuration Panel in Main View ---
+# Main Configuration Panel
 st.markdown("""
-<div style="background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin: 1rem 0;">
-    <h3 style="color: #e6007e; font-weight: 600; margin-bottom: 1.5rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem;">
-        ⚙️ Configuration Panel - {'Barnwell Site' if site_toggle else 'Custom Site'}
-    </h3>
+<div class="config-panel">
+    <div class="config-header">
+        <h3 style="margin: 0; font-weight: 700; font-size: 1.3rem;">⚙️ MASTER CONTROL PANEL</h3>
+        <p style="margin: 0.5rem 0 0 0; opacity: 0.9; font-size: 0.9rem;">{'Barnwell Site - Pre-configured' if site_toggle else 'Custom Site - Full Control'}</p>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
 # Show site info if Barnwell is selected
 if site_toggle:
     st.markdown("""
-    <div style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
-        <h4 style="color: #0c4a6e; margin: 0 0 0.5rem 0;">🏢 Barnwell Site - Pre-configured Parameters</h4>
-        <p style="color: #0369a1; margin: 0; font-size: 0.9rem;">
+    <div class="site-info">
+        <h4 style="margin: 0 0 0.5rem 0; font-weight: 600;">🏢 Barnwell Site - Pre-configured Parameters</h4>
+        <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">
             Area: 22,102 m² | CHP: 44.7 kW Thermal, 19.97 kW Electric | Heat Pump: 60 kW, COP 4.0 | 
             Boiler Efficiency: 85% | System Loss: 50%
         </p>
     </div>
     """, unsafe_allow_html=True)
 
-# --- Input Parameters with Dial Controls ---
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
-    st.markdown('<div class="section-header">🏠 Building Parameters</div>', unsafe_allow_html=True)
-    area = st.slider("Area (m²)", 0, 50000, defaults.get("area", 0), 100, disabled=site_toggle)
-    indoor_temp = st.slider("Indoor Temp (°C)", 15, 25, defaults.get("indoor_temp", 20), 1, disabled=site_toggle)
-    outdoor_temp = st.slider("Outdoor Temp (°C)", -10, 20, defaults.get("outdoor_temp", 5), 1, disabled=site_toggle)
-
-with col2:
-    st.markdown('<div class="section-header">⚡ System Parameters</div>', unsafe_allow_html=True)
-    u_value = st.slider("U-Value (W/m²K)", 0.05, 0.5, float(defaults.get("u_value", 0.15)), 0.01, disabled=site_toggle)
-    system_loss = st.slider("System Loss (%)", 0, 100, int(defaults.get("system_loss", 0.5) * 100), 5, disabled=site_toggle) / 100
-    boiler_eff = st.slider("Boiler Efficiency (%)", 1, 100, int(defaults.get("boiler_eff", 85)), 5, disabled=site_toggle) / 100
-
-with col3:
-    st.markdown('<div class="section-header">💰 Economic Parameters</div>', unsafe_allow_html=True)
-    co2_factor = st.slider("CO₂ Factor (kg/kWh)", 0.1, 0.5, float(defaults.get("co2_factor", 0.23)), 0.01, disabled=site_toggle)
-    elec_price = st.slider("Electricity Price (€/kWh)", 0.1, 0.5, float(defaults.get("elec_price", 0.25)), 0.01, disabled=site_toggle)
-
-with col4:
-    st.markdown('<div class="section-header">📊 Visualization</div>', unsafe_allow_html=True)
-    chart_type = st.selectbox("Chart Type", ["Line Chart", "Bar Chart", "Area Chart", "Scatter Plot"])
-    show_metrics = st.checkbox("Show Metrics", value=True)
-    show_forecast = st.checkbox("Show Monthly Forecast", value=True)
-    show_breakdown = st.checkbox("Show Energy Breakdown", value=True)
-    show_efficiency = st.checkbox("Show Efficiency Analysis", value=True)
-
-# --- System Configuration with Toggles ---
-st.markdown('<div class="section-header">⚙️ System Configuration</div>', unsafe_allow_html=True)
-
-# CHP Configuration
-col1, col2 = st.columns(2)
-with col1:
-    st.markdown("""
-    <div style="background: #f9fafb; border-radius: 8px; padding: 1rem; border: 1px solid #e5e7eb;">
-        <h4 style="color: #374151; font-weight: 600; margin-bottom: 1rem;">🔥 CHP System</h4>
-    </div>
-    """, unsafe_allow_html=True)
+# Configuration Controls in Single Frame
+with st.container():
+    st.markdown('<div class="config-panel">', unsafe_allow_html=True)
     
-    chp_on = st.toggle("CHP Installed", value=defaults.get("chp_installed") == "Yes", disabled=site_toggle)
+    # Top Row - Building & System Parameters
+    col1, col2, col3, col4 = st.columns(4)
     
-    if chp_on:
-        chp_th = st.slider("CHP Thermal Output (kW)", 0, 100, int(defaults.get("chp_th", 0)), 1, disabled=site_toggle)
-        chp_el = st.slider("CHP Elec Output (kW)", 0, 50, int(defaults.get("chp_el", 0)), 1, disabled=site_toggle)
-        chp_gas = st.slider("CHP Gas Input (kW)", 0, 150, int(defaults.get("chp_gas", 0)), 1, disabled=site_toggle)
-        chp_hours = st.slider("CHP Hours/Day", 0, 24, defaults.get("chp_hours", 0), 1, disabled=site_toggle)
-        chp_adj = st.slider("CHP Adjustment (%)", 0, 100, int(defaults.get("chp_adj", 0.95) * 100), 5, disabled=site_toggle) / 100
-    else:
-        chp_th = chp_el = chp_gas = chp_hours = chp_adj = 0
-
-# Heat Pump Configuration
-with col2:
-    st.markdown("""
-    <div style="background: #f9fafb; border-radius: 8px; padding: 1rem; border: 1px solid #e5e7eb;">
-        <h4 style="color: #374151; font-weight: 600; margin-bottom: 1rem;">❄️ Heat Pump System</h4>
-    </div>
-    """, unsafe_allow_html=True)
+    with col1:
+        st.markdown('<div class="dial-container">', unsafe_allow_html=True)
+        st.markdown('<div class="dial-label">🏠 Building Area</div>', unsafe_allow_html=True)
+        area = st.slider("", 0, 50000, defaults.get("area", 0), 100, disabled=site_toggle, key="area_dial")
+        st.markdown(f'<div class="dial-value">{area:,.0f} m²</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        st.markdown('<div class="dial-container">', unsafe_allow_html=True)
+        st.markdown('<div class="dial-label">🌡️ Indoor Temp</div>', unsafe_allow_html=True)
+        indoor_temp = st.slider("", 15, 25, defaults.get("indoor_temp", 20), 1, disabled=site_toggle, key="indoor_dial")
+        st.markdown(f'<div class="dial-value">{indoor_temp}°C</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
     
-    hp_on = st.toggle("Heat Pump Installed", value=defaults.get("hp_installed") == "Yes", disabled=site_toggle)
+    with col2:
+        st.markdown('<div class="dial-container">', unsafe_allow_html=True)
+        st.markdown('<div class="dial-label">⚡ U-Value</div>', unsafe_allow_html=True)
+        u_value = st.slider("", 0.05, 0.5, float(defaults.get("u_value", 0.15)), 0.01, disabled=site_toggle, key="uvalue_dial")
+        st.markdown(f'<div class="dial-value">{u_value:.2f} W/m²K</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        st.markdown('<div class="dial-container">', unsafe_allow_html=True)
+        st.markdown('<div class="dial-label">🔥 Boiler Efficiency</div>', unsafe_allow_html=True)
+        boiler_eff = st.slider("", 1, 100, int(defaults.get("boiler_eff", 85)), 5, disabled=site_toggle, key="boiler_dial")
+        st.markdown(f'<div class="dial-value">{boiler_eff}%</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
     
-    if hp_on:
-        hp_th = st.slider("HP Thermal Output (kW)", 0, 100, int(defaults.get("hp_th", 0)), 1, disabled=site_toggle)
-        hp_hours = st.slider("HP Hours/Day", 0, 24, defaults.get("hp_hours", 0), 1, disabled=site_toggle)
-        hp_cop = st.slider("HP COP", 1, 6, float(defaults.get("hp_cop", 1)), 0.1, disabled=site_toggle)
-    else:
-        hp_th = hp_hours = hp_cop = 0
+    with col3:
+        st.markdown('<div class="dial-container">', unsafe_allow_html=True)
+        st.markdown('<div class="dial-label">💰 Electricity Price</div>', unsafe_allow_html=True)
+        elec_price = st.slider("", 0.1, 0.5, float(defaults.get("elec_price", 0.25)), 0.01, disabled=site_toggle, key="elec_dial")
+        st.markdown(f'<div class="dial-value">€{elec_price:.2f}/kWh</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        st.markdown('<div class="dial-container">', unsafe_allow_html=True)
+        st.markdown('<div class="dial-label">🌍 CO₂ Factor</div>', unsafe_allow_html=True)
+        co2_factor = st.slider("", 0.1, 0.5, float(defaults.get("co2_factor", 0.23)), 0.01, disabled=site_toggle, key="co2_dial")
+        st.markdown(f'<div class="dial-value">{co2_factor:.2f} kg/kWh</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    with col4:
+        st.markdown('<div class="dial-container">', unsafe_allow_html=True)
+        st.markdown('<div class="dial-label">📊 Chart Type</div>', unsafe_allow_html=True)
+        chart_type = st.selectbox("", ["Line Chart", "Bar Chart", "Area Chart", "Scatter Plot"], key="chart_dial")
+        st.markdown(f'<div class="dial-value">{chart_type}</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        st.markdown('<div class="toggle-switch">', unsafe_allow_html=True)
+        st.markdown('<div class="dial-label">📈 Show Forecast</div>', unsafe_allow_html=True)
+        show_forecast = st.checkbox("", value=True, key="forecast_toggle")
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    # System Configuration Row
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown('<div class="toggle-switch">', unsafe_allow_html=True)
+        st.markdown('<div class="dial-label">🔥 CHP System</div>', unsafe_allow_html=True)
+        chp_on = st.toggle("Installed", value=defaults.get("chp_installed") == "Yes", disabled=site_toggle, key="chp_toggle")
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        if chp_on:
+            st.markdown('<div class="dial-container">', unsafe_allow_html=True)
+            st.markdown('<div class="dial-label">CHP Thermal Output</div>', unsafe_allow_html=True)
+            chp_th = st.slider("", 0, 100, int(defaults.get("chp_th", 0)), 1, disabled=site_toggle, key="chp_th_dial")
+            st.markdown(f'<div class="dial-value">{chp_th} kW</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            st.markdown('<div class="dial-container">', unsafe_allow_html=True)
+            st.markdown('<div class="dial-label">CHP Hours/Day</div>', unsafe_allow_html=True)
+            chp_hours = st.slider("", 0, 24, defaults.get("chp_hours", 0), 1, disabled=site_toggle, key="chp_hours_dial")
+            st.markdown(f'<div class="dial-value">{chp_hours} hrs</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+        else:
+            chp_th = chp_hours = 0
+    
+    with col2:
+        st.markdown('<div class="toggle-switch">', unsafe_allow_html=True)
+        st.markdown('<div class="dial-label">❄️ Heat Pump System</div>', unsafe_allow_html=True)
+        hp_on = st.toggle("Installed", value=defaults.get("hp_installed") == "Yes", disabled=site_toggle, key="hp_toggle")
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        if hp_on:
+            st.markdown('<div class="dial-container">', unsafe_allow_html=True)
+            st.markdown('<div class="dial-label">HP Thermal Output</div>', unsafe_allow_html=True)
+            hp_th = st.slider("", 0, 100, int(defaults.get("hp_th", 0)), 1, disabled=site_toggle, key="hp_th_dial")
+            st.markdown(f'<div class="dial-value">{hp_th} kW</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            st.markdown('<div class="dial-container">', unsafe_allow_html=True)
+            st.markdown('<div class="dial-label">HP COP</div>', unsafe_allow_html=True)
+            hp_cop = st.slider("", 1, 6, float(defaults.get("hp_cop", 1)), 0.1, disabled=site_toggle, key="hp_cop_dial")
+            st.markdown(f'<div class="dial-value">{hp_cop:.1f}</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+        else:
+            hp_th = hp_cop = 0
+    
+    # Additional parameters
+    outdoor_temp = defaults.get("outdoor_temp", 5)
+    system_loss = defaults.get("system_loss", 0.5)
+    chp_el = defaults.get("chp_el", 0) if chp_on else 0
+    chp_gas = defaults.get("chp_gas", 0) if chp_on else 0
+    chp_adj = defaults.get("chp_adj", 0.95) if chp_on else 0
+    hp_hours = defaults.get("hp_hours", 0) if hp_on else 0
+    show_metrics = True
+    show_breakdown = True
+    show_efficiency = True
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # --- Calculations ---
 heat_demand = (u_value * area * (indoor_temp - outdoor_temp) * 24 / 1000) * (1 + system_loss)
