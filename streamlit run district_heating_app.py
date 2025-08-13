@@ -7,39 +7,38 @@ from plotly.subplots import make_subplots
 # --- Page Setup ---
 st.set_page_config(page_title="Prepay Power: District Heating Forecast", layout="wide")
 
-# --- Prepay Power Website Styling ---
+# --- Clean Modern Styling ---
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     
     /* Global Styles */
     .main {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         font-size: 11px;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        background: #fafafa;
     }
     
     /* Header Styling */
     .header-container {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        padding: 2rem 0;
-        margin: -2rem -2rem 2rem -2rem;
-        border-radius: 0 0 20px 20px;
-        box-shadow: 0 4px 20px rgba(40, 167, 69, 0.2);
+        background: #e6007e;
+        padding: 1.5rem 0;
+        margin: -1rem -1rem 2rem -1rem;
+        border-radius: 0 0 12px 12px;
+        box-shadow: 0 2px 8px rgba(230, 0, 126, 0.15);
     }
     
     .header-title {
         color: white !important;
-        font-size: 2.5rem !important;
-        font-weight: 800 !important;
+        font-size: 2rem !important;
+        font-weight: 600 !important;
         text-align: center;
         margin: 0;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     .header-subtitle {
         color: rgba(255,255,255,0.9) !important;
-        font-size: 1.1rem !important;
+        font-size: 1rem !important;
         text-align: center;
         margin-top: 0.5rem;
         font-weight: 400;
@@ -47,58 +46,41 @@ st.markdown("""
     
     /* Sidebar Styling */
     .css-1d391kg {
-        background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
-        border-right: 1px solid #e9ecef;
+        background: #ffffff;
+        border-right: 1px solid #e5e7eb;
     }
     
     .sidebar .sidebar-content {
-        background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
-    }
-    
-    /* Card Styling */
-    .metric-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin: 0.5rem 0;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        border: 1px solid #e9ecef;
-        transition: all 0.3s ease;
-    }
-    
-    .metric-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        background: #ffffff;
     }
     
     /* Frame Styling */
     .frame-container {
         background: white;
-        border-radius: 16px;
-        padding: 1.5rem;
+        border-radius: 8px;
+        padding: 1.25rem;
         margin: 0.5rem 0;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        border: 1px solid #e9ecef;
-        min-height: 400px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid #e5e7eb;
+        min-height: 350px;
     }
     
     .frame-title {
-        color: #28a745 !important;
-        font-size: 1.2rem !important;
-        font-weight: 700 !important;
+        color: #374151 !important;
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
         margin-bottom: 1rem;
-        border-bottom: 2px solid #e9ecef;
+        border-bottom: 1px solid #e5e7eb;
         padding-bottom: 0.5rem;
     }
     
     /* Metric Styling */
     .stMetric {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        border-radius: 8px;
-        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 6px;
+        padding: 0.75rem;
         margin: 0.5rem 0;
-        color: white;
-        font-weight: 600;
+        border: 1px solid #e5e7eb;
     }
     
     .stMetric > div {
@@ -106,8 +88,8 @@ st.markdown("""
     }
     
     .stMetric label {
-        color: rgba(255,255,255,0.9) !important;
-        font-size: 0.9rem !important;
+        color: #6b7280 !important;
+        font-size: 0.875rem !important;
         font-weight: 500 !important;
     }
     
@@ -118,62 +100,61 @@ st.markdown("""
     /* Chart Styling */
     .stPlotlyChart {
         background: white;
-        border-radius: 12px;
-        padding: 1rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border-radius: 8px;
+        padding: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     
     /* Form Controls */
     .stSelectbox, .stNumberInput, .stSlider, .stRadio {
         background: white;
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
     }
     
     .stSelectbox > div, .stNumberInput > div {
         background: white;
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
     }
     
     /* Section Headers */
     .section-header {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        background: #e6007e;
         color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
         margin: 1rem 0;
         font-weight: 600;
-        font-size: 1rem;
+        font-size: 0.875rem;
     }
     
     /* Data Table Styling */
     .stDataFrame {
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     
     /* Custom Button Styling */
     .stButton > button {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        background: #e6007e;
         color: white;
         border: none;
-        border-radius: 8px;
+        border-radius: 6px;
         padding: 0.5rem 1rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
+        font-weight: 500;
+        transition: all 0.2s ease;
     }
     
     .stButton > button:hover {
-        background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
-        transform: translateY(-1px);
+        background: #be185d;
     }
     
     /* Responsive Design */
     @media (max-width: 768px) {
         .header-title {
-            font-size: 2rem !important;
+            font-size: 1.5rem !important;
         }
         .frame-container {
             margin: 0.25rem 0;
@@ -188,21 +169,21 @@ st.markdown("""
     
     /* Custom Scrollbar */
     ::-webkit-scrollbar {
-        width: 8px;
+        width: 6px;
     }
     
     ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 4px;
+        background: #f3f4f6;
+        border-radius: 3px;
     }
     
     ::-webkit-scrollbar-thumb {
-        background: #28a745;
-        border-radius: 4px;
+        background: #d1d5db;
+        border-radius: 3px;
     }
     
     ::-webkit-scrollbar-thumb:hover {
-        background: #218838;
+        background: #9ca3af;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -323,15 +304,15 @@ with frame2:
         if chart_type == "Bar Chart":
             fig = px.bar(energy_df, x="Source", y="Energy (kWh)", 
                         title="Daily Energy Breakdown", color="Source",
-                        color_discrete_sequence=['#28a745', '#20c997', '#17a2b8'])
+                        color_discrete_sequence=['#e6007e', '#8b5cf6', '#06b6d4'])
         elif chart_type == "Pie Chart":
             fig = px.pie(energy_df, values="Energy (kWh)", names="Source", 
                         title="Energy Source Distribution",
-                        color_discrete_sequence=['#28a745', '#20c997', '#17a2b8'])
+                        color_discrete_sequence=['#e6007e', '#8b5cf6', '#06b6d4'])
         else:
             fig = px.bar(energy_df, x="Source", y="Energy (kWh)", 
                         title="Daily Energy Breakdown", color="Source",
-                        color_discrete_sequence=['#28a745', '#20c997', '#17a2b8'])
+                        color_discrete_sequence=['#e6007e', '#8b5cf6', '#06b6d4'])
         
         fig.update_layout(
             font=dict(size=11, family="Inter"),
@@ -339,7 +320,7 @@ with frame2:
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
             title_font_size=14,
-            title_font_color='#28a745'
+            title_font_color='#374151'
         )
         st.plotly_chart(fig, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -362,7 +343,7 @@ with frame3:
         
         fig = px.bar(eff_df, x="Metric", y="Value (%)", 
                     title="System Efficiency Metrics", color="Metric",
-                    color_discrete_sequence=['#28a745', '#20c997', '#17a2b8', '#6f42c1'])
+                    color_discrete_sequence=['#e6007e', '#8b5cf6', '#06b6d4', '#10b981'])
         fig.update_layout(
             font=dict(size=11, family="Inter"),
             height=300,
@@ -370,7 +351,7 @@ with frame3:
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
             title_font_size=14,
-            title_font_color='#28a745'
+            title_font_color='#374151'
         )
         st.plotly_chart(fig, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -393,14 +374,14 @@ with frame4:
     
     fig = px.bar(cost_df, x="Component", y="Cost (€/day)", 
                 title="Daily Cost Breakdown", color="Cost (€/day)",
-                color_continuous_scale=['#dc3545', '#ffc107', '#28a745'])
+                color_continuous_scale=['#ef4444', '#f59e0b', '#10b981'])
     fig.update_layout(
         font=dict(size=11, family="Inter"),
         height=300,
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         title_font_size=14,
-        title_font_color='#28a745'
+        title_font_color='#374151'
     )
     st.plotly_chart(fig, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
