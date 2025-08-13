@@ -221,36 +221,55 @@ sites = {
     "Custom": {}
 }
 
-# --- Select Site ---
-site = st.selectbox("📍 Select Site", list(sites.keys()))
+# --- Site Selection Toggle ---
+col1, col2 = st.columns([1, 3])
+with col1:
+    site_toggle = st.toggle("🏢 Barnwell Site", value=True, help="Toggle between Barnwell (pre-configured) and Custom site")
+    
+# Set site based on toggle
+site = "Barnwell" if site_toggle else "Custom"
 defaults = sites.get(site, {})
 
 # --- Configuration Panel in Main View ---
 st.markdown("""
 <div style="background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin: 1rem 0;">
-    <h3 style="color: #e6007e; font-weight: 600; margin-bottom: 1.5rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem;">⚙️ Configuration Panel</h3>
+    <h3 style="color: #e6007e; font-weight: 600; margin-bottom: 1.5rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem;">
+        ⚙️ Configuration Panel - {'Barnwell Site' if site_toggle else 'Custom Site'}
+    </h3>
 </div>
 """, unsafe_allow_html=True)
+
+# Show site info if Barnwell is selected
+if site_toggle:
+    st.markdown("""
+    <div style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+        <h4 style="color: #0c4a6e; margin: 0 0 0.5rem 0;">🏢 Barnwell Site - Pre-configured Parameters</h4>
+        <p style="color: #0369a1; margin: 0; font-size: 0.9rem;">
+            Area: 22,102 m² | CHP: 44.7 kW Thermal, 19.97 kW Electric | Heat Pump: 60 kW, COP 4.0 | 
+            Boiler Efficiency: 85% | System Loss: 50%
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
 # --- Input Parameters with Dial Controls ---
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     st.markdown('<div class="section-header">🏠 Building Parameters</div>', unsafe_allow_html=True)
-    area = st.slider("Area (m²)", 0, 50000, defaults.get("area", 0), 100)
-    indoor_temp = st.slider("Indoor Temp (°C)", 15, 25, defaults.get("indoor_temp", 20), 1)
-    outdoor_temp = st.slider("Outdoor Temp (°C)", -10, 20, defaults.get("outdoor_temp", 5), 1)
+    area = st.slider("Area (m²)", 0, 50000, defaults.get("area", 0), 100, disabled=site_toggle)
+    indoor_temp = st.slider("Indoor Temp (°C)", 15, 25, defaults.get("indoor_temp", 20), 1, disabled=site_toggle)
+    outdoor_temp = st.slider("Outdoor Temp (°C)", -10, 20, defaults.get("outdoor_temp", 5), 1, disabled=site_toggle)
 
 with col2:
     st.markdown('<div class="section-header">⚡ System Parameters</div>', unsafe_allow_html=True)
-    u_value = st.slider("U-Value (W/m²K)", 0.05, 0.5, float(defaults.get("u_value", 0.15)), 0.01)
-    system_loss = st.slider("System Loss (%)", 0, 100, int(defaults.get("system_loss", 0.5) * 100), 5) / 100
-    boiler_eff = st.slider("Boiler Efficiency (%)", 1, 100, int(defaults.get("boiler_eff", 85)), 5) / 100
+    u_value = st.slider("U-Value (W/m²K)", 0.05, 0.5, float(defaults.get("u_value", 0.15)), 0.01, disabled=site_toggle)
+    system_loss = st.slider("System Loss (%)", 0, 100, int(defaults.get("system_loss", 0.5) * 100), 5, disabled=site_toggle) / 100
+    boiler_eff = st.slider("Boiler Efficiency (%)", 1, 100, int(defaults.get("boiler_eff", 85)), 5, disabled=site_toggle) / 100
 
 with col3:
     st.markdown('<div class="section-header">💰 Economic Parameters</div>', unsafe_allow_html=True)
-    co2_factor = st.slider("CO₂ Factor (kg/kWh)", 0.1, 0.5, float(defaults.get("co2_factor", 0.23)), 0.01)
-    elec_price = st.slider("Electricity Price (€/kWh)", 0.1, 0.5, float(defaults.get("elec_price", 0.25)), 0.01)
+    co2_factor = st.slider("CO₂ Factor (kg/kWh)", 0.1, 0.5, float(defaults.get("co2_factor", 0.23)), 0.01, disabled=site_toggle)
+    elec_price = st.slider("Electricity Price (€/kWh)", 0.1, 0.5, float(defaults.get("elec_price", 0.25)), 0.01, disabled=site_toggle)
 
 with col4:
     st.markdown('<div class="section-header">📊 Visualization</div>', unsafe_allow_html=True)
@@ -272,14 +291,14 @@ with col1:
     </div>
     """, unsafe_allow_html=True)
     
-    chp_on = st.toggle("CHP Installed", value=defaults.get("chp_installed") == "Yes")
+    chp_on = st.toggle("CHP Installed", value=defaults.get("chp_installed") == "Yes", disabled=site_toggle)
     
     if chp_on:
-        chp_th = st.slider("CHP Thermal Output (kW)", 0, 100, int(defaults.get("chp_th", 0)), 1)
-        chp_el = st.slider("CHP Elec Output (kW)", 0, 50, int(defaults.get("chp_el", 0)), 1)
-        chp_gas = st.slider("CHP Gas Input (kW)", 0, 150, int(defaults.get("chp_gas", 0)), 1)
-        chp_hours = st.slider("CHP Hours/Day", 0, 24, defaults.get("chp_hours", 0), 1)
-        chp_adj = st.slider("CHP Adjustment (%)", 0, 100, int(defaults.get("chp_adj", 0.95) * 100), 5) / 100
+        chp_th = st.slider("CHP Thermal Output (kW)", 0, 100, int(defaults.get("chp_th", 0)), 1, disabled=site_toggle)
+        chp_el = st.slider("CHP Elec Output (kW)", 0, 50, int(defaults.get("chp_el", 0)), 1, disabled=site_toggle)
+        chp_gas = st.slider("CHP Gas Input (kW)", 0, 150, int(defaults.get("chp_gas", 0)), 1, disabled=site_toggle)
+        chp_hours = st.slider("CHP Hours/Day", 0, 24, defaults.get("chp_hours", 0), 1, disabled=site_toggle)
+        chp_adj = st.slider("CHP Adjustment (%)", 0, 100, int(defaults.get("chp_adj", 0.95) * 100), 5, disabled=site_toggle) / 100
     else:
         chp_th = chp_el = chp_gas = chp_hours = chp_adj = 0
 
@@ -291,12 +310,12 @@ with col2:
     </div>
     """, unsafe_allow_html=True)
     
-    hp_on = st.toggle("Heat Pump Installed", value=defaults.get("hp_installed") == "Yes")
+    hp_on = st.toggle("Heat Pump Installed", value=defaults.get("hp_installed") == "Yes", disabled=site_toggle)
     
     if hp_on:
-        hp_th = st.slider("HP Thermal Output (kW)", 0, 100, int(defaults.get("hp_th", 0)), 1)
-        hp_hours = st.slider("HP Hours/Day", 0, 24, defaults.get("hp_hours", 0), 1)
-        hp_cop = st.slider("HP COP", 1, 6, float(defaults.get("hp_cop", 1)), 0.1)
+        hp_th = st.slider("HP Thermal Output (kW)", 0, 100, int(defaults.get("hp_th", 0)), 1, disabled=site_toggle)
+        hp_hours = st.slider("HP Hours/Day", 0, 24, defaults.get("hp_hours", 0), 1, disabled=site_toggle)
+        hp_cop = st.slider("HP COP", 1, 6, float(defaults.get("hp_cop", 1)), 0.1, disabled=site_toggle)
     else:
         hp_th = hp_hours = hp_cop = 0
 
