@@ -221,48 +221,84 @@ sites = {
     "Custom": {}
 }
 
-# --- Sidebar Styling ---
-st.sidebar.markdown("""
-<div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-    <h3 style="color: white; margin: 0; font-weight: 600;">⚙️ Configuration Panel</h3>
+# --- Select Site ---
+site = st.selectbox("📍 Select Site", list(sites.keys()))
+defaults = sites.get(site, {})
+
+# --- Configuration Panel in Main View ---
+st.markdown("""
+<div style="background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin: 1rem 0;">
+    <h3 style="color: #e6007e; font-weight: 600; margin-bottom: 1.5rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem;">⚙️ Configuration Panel</h3>
 </div>
 """, unsafe_allow_html=True)
 
-# --- Select Site ---
-site = st.sidebar.selectbox("📍 Select Site", list(sites.keys()))
-defaults = sites.get(site, {})
+# --- Input Parameters with Dial Controls ---
+col1, col2, col3, col4 = st.columns(4)
 
-# --- Input Panel ---
-st.sidebar.markdown('<div class="section-header">🔧 Input Parameters</div>', unsafe_allow_html=True)
-area = st.sidebar.number_input("Area (m²)", value=defaults.get("area", 0))
-indoor_temp = st.sidebar.number_input("Indoor Temp (°C)", value=defaults.get("indoor_temp", 20))
-outdoor_temp = st.sidebar.number_input("Outdoor Temp (°C)", value=defaults.get("outdoor_temp", 5))
-u_value = st.sidebar.number_input("U-Value (W/m²K)", value=defaults.get("u_value", 0.15))
-system_loss = st.sidebar.slider("System Loss (%)", 0, 100, int(defaults.get("system_loss", 0.5) * 100)) / 100
-boiler_eff = st.sidebar.slider("Boiler Efficiency (%)", 1, 100, int(defaults.get("boiler_eff", 85))) / 100
-co2_factor = st.sidebar.number_input("CO₂ Emission Factor (kg/kWh)", value=defaults.get("co2_factor", 0.23))
-elec_price = st.sidebar.number_input("Electricity Price (€/kWh)", value=defaults.get("elec_price", 0.25))
+with col1:
+    st.markdown('<div class="section-header">🏠 Building Parameters</div>', unsafe_allow_html=True)
+    area = st.slider("Area (m²)", 0, 50000, defaults.get("area", 0), 100)
+    indoor_temp = st.slider("Indoor Temp (°C)", 15, 25, defaults.get("indoor_temp", 20), 1)
+    outdoor_temp = st.slider("Outdoor Temp (°C)", -10, 20, defaults.get("outdoor_temp", 5), 1)
 
-st.sidebar.markdown('<div class="section-header">⚙️ System Configuration</div>', unsafe_allow_html=True)
-chp_on = st.sidebar.radio("CHP Installed?", ["Yes", "No"], index=0 if defaults.get("chp_installed") == "Yes" else 1)
-chp_th = st.sidebar.number_input("CHP Thermal Output (kW)", value=defaults.get("chp_th", 0), disabled=chp_on == "No")
-chp_el = st.sidebar.number_input("CHP Elec Output (kW)", value=defaults.get("chp_el", 0), disabled=chp_on == "No")
-chp_gas = st.sidebar.number_input("CHP Gas Input (kW)", value=defaults.get("chp_gas", 0), disabled=chp_on == "No")
-chp_hours = st.sidebar.slider("CHP Hours/Day", 0, 24, value=defaults.get("chp_hours", 0), disabled=chp_on == "No")
-chp_adj = st.sidebar.slider("CHP Adjustment (%)", 0, 100, int(defaults.get("chp_adj", 0.95) * 100), disabled=chp_on == "No") / 100
+with col2:
+    st.markdown('<div class="section-header">⚡ System Parameters</div>', unsafe_allow_html=True)
+    u_value = st.slider("U-Value (W/m²K)", 0.05, 0.5, float(defaults.get("u_value", 0.15)), 0.01)
+    system_loss = st.slider("System Loss (%)", 0, 100, int(defaults.get("system_loss", 0.5) * 100), 5) / 100
+    boiler_eff = st.slider("Boiler Efficiency (%)", 1, 100, int(defaults.get("boiler_eff", 85)), 5) / 100
 
-hp_on = st.sidebar.radio("Heat Pump Installed?", ["Yes", "No"], index=0 if defaults.get("hp_installed") == "Yes" else 1)
-hp_th = st.sidebar.number_input("HP Thermal Output (kW)", value=defaults.get("hp_th", 0), disabled=hp_on == "No")
-hp_hours = st.sidebar.slider("HP Hours/Day", 0, 24, value=defaults.get("hp_hours", 0), disabled=hp_on == "No")
-hp_cop = st.sidebar.number_input("HP COP", value=defaults.get("hp_cop", 1), disabled=hp_on == "No")
+with col3:
+    st.markdown('<div class="section-header">💰 Economic Parameters</div>', unsafe_allow_html=True)
+    co2_factor = st.slider("CO₂ Factor (kg/kWh)", 0.1, 0.5, float(defaults.get("co2_factor", 0.23)), 0.01)
+    elec_price = st.slider("Electricity Price (€/kWh)", 0.1, 0.5, float(defaults.get("elec_price", 0.25)), 0.01)
 
-# --- Dynamic Visualization Controls ---
-st.sidebar.markdown('<div class="section-header">📊 Visualization Settings</div>', unsafe_allow_html=True)
-chart_type = st.sidebar.selectbox("Chart Type", ["Line Chart", "Bar Chart", "Area Chart", "Scatter Plot"])
-show_metrics = st.sidebar.checkbox("Show Metrics", value=True)
-show_forecast = st.sidebar.checkbox("Show Monthly Forecast", value=True)
-show_breakdown = st.sidebar.checkbox("Show Energy Breakdown", value=True)
-show_efficiency = st.sidebar.checkbox("Show Efficiency Analysis", value=True)
+with col4:
+    st.markdown('<div class="section-header">📊 Visualization</div>', unsafe_allow_html=True)
+    chart_type = st.selectbox("Chart Type", ["Line Chart", "Bar Chart", "Area Chart", "Scatter Plot"])
+    show_metrics = st.checkbox("Show Metrics", value=True)
+    show_forecast = st.checkbox("Show Monthly Forecast", value=True)
+    show_breakdown = st.checkbox("Show Energy Breakdown", value=True)
+    show_efficiency = st.checkbox("Show Efficiency Analysis", value=True)
+
+# --- System Configuration with Toggles ---
+st.markdown('<div class="section-header">⚙️ System Configuration</div>', unsafe_allow_html=True)
+
+# CHP Configuration
+col1, col2 = st.columns(2)
+with col1:
+    st.markdown("""
+    <div style="background: #f9fafb; border-radius: 8px; padding: 1rem; border: 1px solid #e5e7eb;">
+        <h4 style="color: #374151; font-weight: 600; margin-bottom: 1rem;">🔥 CHP System</h4>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    chp_on = st.toggle("CHP Installed", value=defaults.get("chp_installed") == "Yes")
+    
+    if chp_on:
+        chp_th = st.slider("CHP Thermal Output (kW)", 0, 100, int(defaults.get("chp_th", 0)), 1)
+        chp_el = st.slider("CHP Elec Output (kW)", 0, 50, int(defaults.get("chp_el", 0)), 1)
+        chp_gas = st.slider("CHP Gas Input (kW)", 0, 150, int(defaults.get("chp_gas", 0)), 1)
+        chp_hours = st.slider("CHP Hours/Day", 0, 24, defaults.get("chp_hours", 0), 1)
+        chp_adj = st.slider("CHP Adjustment (%)", 0, 100, int(defaults.get("chp_adj", 0.95) * 100), 5) / 100
+    else:
+        chp_th = chp_el = chp_gas = chp_hours = chp_adj = 0
+
+# Heat Pump Configuration
+with col2:
+    st.markdown("""
+    <div style="background: #f9fafb; border-radius: 8px; padding: 1rem; border: 1px solid #e5e7eb;">
+        <h4 style="color: #374151; font-weight: 600; margin-bottom: 1rem;">❄️ Heat Pump System</h4>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    hp_on = st.toggle("Heat Pump Installed", value=defaults.get("hp_installed") == "Yes")
+    
+    if hp_on:
+        hp_th = st.slider("HP Thermal Output (kW)", 0, 100, int(defaults.get("hp_th", 0)), 1)
+        hp_hours = st.slider("HP Hours/Day", 0, 24, defaults.get("hp_hours", 0), 1)
+        hp_cop = st.slider("HP COP", 1, 6, float(defaults.get("hp_cop", 1)), 0.1)
+    else:
+        hp_th = hp_hours = hp_cop = 0
 
 # --- Calculations ---
 heat_demand = (u_value * area * (indoor_temp - outdoor_temp) * 24 / 1000) * (1 + system_loss)
@@ -389,8 +425,8 @@ with frame4:
 # --- Monthly Forecast (Full Width) ---
 if show_forecast:
     st.markdown("""
-    <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 1.5rem; border-radius: 16px; margin: 2rem 0;">
-        <h2 style="color: white; margin: 0; font-weight: 700;">📈 Monthly Forecast</h2>
+    <div style="background: #e6007e; padding: 1.25rem; border-radius: 8px; margin: 2rem 0;">
+        <h2 style="color: white; margin: 0; font-weight: 600;">📈 Monthly Forecast</h2>
     </div>
     """, unsafe_allow_html=True)
     
@@ -419,19 +455,19 @@ if show_forecast:
     if chart_type == "Line Chart":
         fig = px.line(df, x="Month", y=["Heating", "CHP", "HP", "Boiler"],
                       title="Monthly Heating Forecast (kWh)", markers=True,
-                      color_discrete_sequence=['#28a745', '#20c997', '#17a2b8', '#6f42c1'])
+                      color_discrete_sequence=['#e6007e', '#8b5cf6', '#06b6d4', '#10b981'])
     elif chart_type == "Bar Chart":
         fig = px.bar(df, x="Month", y=["Heating", "CHP", "HP", "Boiler"],
                      title="Monthly Heating Forecast (kWh)", barmode='stack',
-                     color_discrete_sequence=['#28a745', '#20c997', '#17a2b8', '#6f42c1'])
+                     color_discrete_sequence=['#e6007e', '#8b5cf6', '#06b6d4', '#10b981'])
     elif chart_type == "Area Chart":
         fig = px.area(df, x="Month", y=["Heating", "CHP", "HP", "Boiler"],
                       title="Monthly Heating Forecast (kWh)",
-                      color_discrete_sequence=['#28a745', '#20c997', '#17a2b8', '#6f42c1'])
+                      color_discrete_sequence=['#e6007e', '#8b5cf6', '#06b6d4', '#10b981'])
     elif chart_type == "Scatter Plot":
         fig = px.scatter(df, x="Month", y=["Heating", "CHP", "HP", "Boiler"],
                          title="Monthly Heating Forecast (kWh)",
-                         color_discrete_sequence=['#28a745', '#20c997', '#17a2b8', '#6f42c1'])
+                         color_discrete_sequence=['#e6007e', '#8b5cf6', '#06b6d4', '#10b981'])
     
     fig.update_layout(
         yaxis_title="Energy (kWh)", 
@@ -442,18 +478,18 @@ if show_forecast:
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         title_font_size=16,
-        title_font_color='#28a745'
+        title_font_color='#374151'
     )
     
     # Add container styling for the chart
-    st.markdown('<div style="background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">', unsafe_allow_html=True)
+    st.markdown('<div style="background: white; border-radius: 8px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">', unsafe_allow_html=True)
     st.plotly_chart(fig, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Interactive data table
     st.markdown("""
-    <div style="background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-top: 1rem;">
-        <h3 style="color: #28a745; font-weight: 700; margin-bottom: 1rem;">📋 Forecast Data</h3>
+    <div style="background: white; border-radius: 8px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-top: 1rem;">
+        <h3 style="color: #374151; font-weight: 600; margin-bottom: 1rem;">📋 Forecast Data</h3>
     </div>
     """, unsafe_allow_html=True)
     st.dataframe(df, use_container_width=True)
